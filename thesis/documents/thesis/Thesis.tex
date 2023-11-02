@@ -1,0 +1,178 @@
+\documentclass[12pt, a4paper, headinclude, twoside, plainheadsepline, open=right, numbers=noenddot, hidelinks, toc=listof, toc=bibliography]{scrreprt}
+
+%&pdflatex
+
+%\usepackage{showframe}
+
+
+% WICHTIG: Hier wird nicht BibTeX sondern BibLateX verwendet!!
+% Deshalb nicht mit bibtex uebersetzen, sondern mit biber
+% Das kann man in jedem Tool wie TexMaker oder TexShop als Option einstellen
+%
+%% Spezielle Einstellungen, insbesondere fuer das Literaturverzeichnis,
+% aber auch Packages wie amsmath, Groessenanpassungen etc.
+\input{./Preferences.tex}
+%
+
+% Hier werden die Referenzen in einer separaten Datei gespeichert
+\addbibresource{Thesis.bib}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------
+%  Informationen
+%----------------------------------------------------------------------------------
+\author{Maximilian Rieder}
+\title{Robust Segmentation in Minimally Invasive Surgery for Smoke Interference}
+\date{\today}
+
+
+\include{abbreviations} % Abkuerzungen
+
+%----------------------------------------------------------------------------------
+%  Anfang des Dokuments
+%----------------------------------------------------------------------------------
+\begin{document}
+\pagenumbering{Roman} % grosse Roemische Seitenummerierung
+\pagestyle{empty}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ********************** Titelseite *********************** %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeatletter
+\begin{titlepage}
+\begin{figure}[thb]
+       \includegraphics[height=2.3cm]{./images/logo/FakIM_Logo} 
+       \hfill
+       \includegraphics[height=2.3cm]{images/logo/OTH_Logo_ReMIC}
+\end{figure}
+\begin{center}
+\rule{0pt}{0pt}
+\vfill
+\vfill
+\vfill
+\vfill
+
+\begin{huge}
+\@title\\[0.75ex]
+\end{huge}
+
+\vfill
+\vfill
+
+
+Masterthesis\\ von\\
+
+\vspace*{.5cm}
+\textbf{\@author}\\
+Matrikelnummer: 3264188
+\vspace{.5cm}
+
+\vfill
+\vfill
+\textbf{\large Fakultät Informatik und Mathematik\\
+Ostbayerische Technische Hochschule Regensburg\\
+(OTH Regensburg)}
+\vfill
+\vfill
+
+\begin{tabular}{rl}
+Gutachter:   		& Prof. Dr. Christoph Palm\\
+Zweitgutachter:   	& Prof. Dr. Jan Dünnweber\\
+%Betreuer:   		& Dr. Max Mustermann\\
+\\Abgabedatum:& \@date
+\end{tabular}
+\end{center}
+\end{titlepage}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ****************** Erklärung zur Arbeit ***************** %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\text{~}
+\vspace{11cm}
+
+\noindent
+Herr\\
+\@author\\
+Maidenbergstraße 1\\
+93059 Regensburg\\
+\smallskip
+
+\noindent
+Studiengang: Master Informatik
+\bigskip
+
+\begin{enumerate}
+\item Mir ist bekannt, dass dieses Exemplar der Masterarbeit als Prüfungsleistung in das Eigentum des Freistaates Bayern übergeht.
+\item Ich erkläre hiermit, dass ich diese Masterarbeit selbstständig verfasst, noch nicht anderweitig für Prüfungszwecke vorgelegt, keine anderen als die angegebenen Quellen und Hilfsmittel benutzt sowie wörtlich und sinngemäße Zitate als solche gekennzeichnet habe.
+\end{enumerate}
+\vspace{1cm}
+Regensburg, den \@date\\
+\medskip
+\medskip
+
+\noindent
+\underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}\\
+\@author
+
+\makeatother
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ******************* Inhaltsverzeichnis ****************** %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage
+\pdfbookmark{\contentsname}{toc}\tableofcontents 										% Inhaltsverzeichnis
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ******************* Beginn des Textes ******************* %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{scrheadings} 																% normale Kopf- und Fusszeilen fuer den Rest
+\cleardoublepage
+\pagenumbering{arabic} 																	% ab jetzt arabische Nummerierung
+
+\include{introduction}
+
+\include{literaturereview}
+
+\include{theoreticalfoundations}
+
+\include{method}
+
+\include{results}
+
+\include{discussion}
+
+\include{outlook}
+
+\include{conclusion}
+
+%\bibliographystyle{natdin}
+%\bibliographystyle{naturemag}
+%\bibliographystyle{geralpha}
+\printbibliography
+
+
+% Anhang
+%\include{appendix}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ********************* Verzeichnisse ********************* %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\listoffigures																			% Abbildungsverzeichnis
+\listoftables																			% Tabellenverzeichnis
+\cleardoublepage\phantomsection\addcontentsline{toc}{chapter}{List of acronyms}	% Abkürzungsverzeichnis
+%\printacronyms[heading={chapter*}, name={List of acronyms}]
+
+
+
+\end{document}

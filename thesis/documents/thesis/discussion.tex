@@ -1,0 +1,121 @@
+\chapter{Discussion and conclusion}\label{discussion}
+\section{Limitations of the metrics}
+\paragraph{mIoU and mDice}
+The way the mIoU and mDice are calculated for the different domains and over all domains, have to be considered with caution.
+This is because the number of images of each individual domain combined with the occurrence of each class of surgical instrument can lead to a small sample size for this combination. 
+In such a scenario, the impact of a single sample with a high or low IoU can have a significant effect on the overall mIoU value.
+To illustrate this, an extreme case was constructed, where the mIoU for two classes in two domains and the total mIoU is calculated.
+\begin{table}[tb]\vspace{1ex}\centering
+    \caption[Metric limitations.]{Calculation of mIoU for domain A and B with respect to classes one and two and the mIoU for both domains united.
+    The factor 100 and 1 indicate the number of pixels, that are contained in the intersection leading to the IoU of 0.7 and 0.1.
+    $100\times0.7$ would indicate an intersection of 70 pixels over the union of 100 pixels resulting in an IoU of 0.7, 
+    $1 \times0.1$ an intersection of 1 divided through the union of 10. $100\times0.7+1\times0.1$ is calculated as $\frac{71}{110}$ resulting in 0.6455 (rounded).\label{metric_limit}}
+    \begin{tabular*}{15cm}{ll|@{\extracolsep\fill}cccc}
+    &&\multicolumn{3}{c}{Metric} \\
+    && Class 1 & Class 2 &  mIoU \\\hline
+    \multirow{3}*{\rotatebox{90}{Domain}}
+    & A &  $1\times0.1 $  & $100\times0.7 $  & 0.4 \\%\cline{2-6}
+    & B & $100\times0.7 $  & $1\times0.1 $ & 0.4 \\%\cline{2-6}
+    & A + B & $100\times0.7 + 1\times0.1 = 0.65 $ & $100\times0.7 + 1\times0.1 = 0.65$ & 0.6455 \\\hline
+    \end{tabular*}
+\vspace{2ex}\end{table}
+In Table \ref{metric_limit} the mIoU for domain A and domain B over the classes one and two results for both domains in 0.4.
+One could expect that the mIoU for A and B is also around 0.4, but it actually is 0.6455.
+This is because the number of intersections for class one in domain A is just one, but has the same influence on the mIoU as the 100 pixels contained in the intersection of class two.  
+If the mIoU is calculated for all domains, the result is more representative, as the ratio of class occurences becomes more balanced.
+As a result, it is important to be cautious when interpreting mIoU values calculated on individual domains, and the mIoU across all domains must be considered.\\
+The same goes for calculating the mean values of the Dice coefficient.
+\paragraph*{FID} The FID is shown to be a metric that closely aligns with human evaluation and is capable of detecting even small differences between compared images \cite{borji2022pros}.
+Therefore, it is a widely adoped metric for evaluating generated images.
+However, Chong et al. have also reported that the FID metric can have a certain bias that depends on the sample size and the generators used for image generation \cite{chong2020effectively}.\\
+\paragraph{SSIM} The SSIM also has its limitations.
+Pambrun et al. demonstrate that the three terms on which SSIM is based can be unstable in certain edge cases, such as regions with low variance, sharp edges, or areas that are very bright or dark \cite{pambrun2015limitations}.
+Because of these limitations, both FID and SSIM are used as metrics, as they follow different approaches, and qualitative human evaluation is additionally used to assess the quality of images.
+
+\section{Image translation}
+The loss values during the training of the CycleGAN indicate a working training, due to the generator and discriminator being in a stable equilibrium, shown in Figure \ref{fig:cycle_disc_gen_loss}.
+Also, the FID and SSIM values of the CycleGAN training depicted in section \ref{i2i_trans} continually improve with only a slight degradation towards the end.
+This indicates an improvement over the course of the training, leading to adequate generation of the images, which is confirmed through human evaluation.\\
+The domain classification loss in StarGAN decreases over the course of the training for the generator and discriminator, meaning the generated images are correctly classified and generated in the correct domain.
+Additionally, neither the generator nor the discriminator overpower one another and reach an equilibrium, which suggests successful training.% anders schreiben bessere wörter aus methode 
+However, the progression of SSIM and FID does not show a clear trend in improvement, shown in Figure \ref{fig:star_metric_plots}.
+This is also reflected in the generated images, depicted in Figure \ref{fig:star_showcase}.
+The generated images resemble the original images quite well and also the smoke generation increases over the course of the training, meaning the model learns the translation fundamentally.
+However, especially in the generated slight-smoke images, strong artifacts occur, and the heavy-smoke ones appear blurry.
+This could be due to the generator being not deep or complex enough.
+The architecture of the StarGAN generator is similar to that of the CycleGAN, but it has to learn the translation and conditioning of an additional domain, including its inverse mapping. 
+This involves significantly more information than a single generator in CycleGAN has to learn.
+Also, the StarGAN was applied in the original paper with images resized to $128\times128$, which is drastically lower than $960\times540$ \cite{choi2018stargan}.
+This may be the reason why the StarGAN is not able to handle the image translation task as effectively as the CycleGAN.\\
+\paragraph{Limitations} Limitations regarding the translation into an artificial smoke domain are that the generated smoke is not as diverse as in the original images.
+Since the smoke in many of the images of the original heavy-smoke domain is very homogeneous, the generator learns this characteristic, and this is reflected in the generation of the images.
+
+\section{Segmentation augmented by generated images}
+Dice and IoU for the segmentation results of the baseline depicted in Table \ref{iou_exp1_table} and \ref{dice_exp1_table} show that for the baseline the images in the no-smoke domain are best segmented, followed by the slight-smoke domain. 
+The DeepLabv3+ performs the worst in the heavy-smoke domain.
+This outcome is to be expected, as smoke acts as a noise source that complicates the segmentation task.\\
+Therefore, attempts were made to improve segmentation in this area by replacing images from the no-smoke domain with their translated version in the heavy-smoke domain.
+Based on mIoU and mDice shown in Tables \ref{iou_exp1_table} and \ref{dice_exp1_table}, it can also be observed that the segmentation network performs better in all domains when a 50-50 ratio is established between no-smoke and heavy-smoke images using the translated images of the CycleGAN.
+This is also supported by the image segmentation masks in Figure \ref{fig:ex1_showcase}.
+It also helps in mitigating other disturbances such as droplets on the lens in Figure \ref{fig:ex1_im1}, resulting in improved segmentation.
+However, as the network becomes more proficient at predicting obscured instruments due to smoke, it may also generate inaccurate predictions in regions where other objects occlude the instruments, as seen in Figure \ref{fig:ex1_im3}.
+This could lead to more inaccurate predictions.\\
+Given that there has been an improvement across all domains and particularly over all images, it can be assumed that the generated images have improved the segmentation performance.
+Nonetheless, the improvement, especially in the images of the heavy-smoke domain, is not as significant as expected.
+This could be ascribed to an increase in false predictions or, alternatively, it could be due to the limitations of the metrics mentioned earlier.
+The fact that there has been more improvement in other areas than in the heavy-smoke domain could be attributed to the presence of other disturbances, such as a smeared lens, which occur in other domains as well. 
+Therefore, the segmentation performance may have also improved in those areas.
+This is evidenced in the segmentation of the image depicted in Figure \ref{fig:ex1_w1}.\\
+Based on the reasons mentioned, it is presumed that the DeepLabv3+ augmented with artificial smoke images exhibits improved performance in handling interferences, albeit with a trade-off of a slight increase in false predictions.
+\paragraph{Limitations} Limitations as to why it did not perform better could include that the similarity of the generated smoke in the translated images may potentially interfere with the desired segmentation improvement, as the information gain regarding the smoke appearance is limited.
+Furthermore, there are also minor artifacts in images generated by CycleGAN that could interfere with the training of the segmentation network.
+
+%-> ansprechen, dass in verrauchten dafür weniger falsch preditcion
+%-> kurvenverläufe (wirkt als könnte es overfitting vermeiden in hs domain)
+%-> iou -> mehr worstcase und dice mittlere verb
+
+\section{GenSegNet}\label{genseg_discussion}
+The loss curves of the GenSegNets shown in Figure \ref{fig:gen_disc_genseg} generally indicate successful training.
+However, based on these loss values, it can be observed that the heavy-smoke images generated by the generator are better recognized by the discriminator as fake images than training only the CycleGAN described in section \ref{cyclegan_experiment}.
+The segmentation reward depicted in Figure \ref{fig:gp_seggan} decreases because the DeepLabv3 model learns to better segment the images over the course of the training.
+The fact that FID and SSIM exhibit worse values during training the GenSegNet compared to the CycleGAN suggests the presence of artifact formation or overall poorer quality of the generated images.
+The artifact formation is confirmed by the images shown in Figure \ref{fig:ex2_img_showcase}.
+The segmentation reward appears to have an influence on the generated images as the smoke in the images of GenSegNet (Fig. \ref{fig:ex2_img_showcase}) appears denser and more prevalent over the instruments than in the images of the CycleGAN (Fig. \ref{fig:cycle_showcase}).
+However, this additional loss could be responsible for the increased artifact formation, as they can also make precise segmentation more challenging.
+Another factor that can negatively affect the image generation is the selective use of training data for the CycleGAN, as a parameter-determined number of images is discarded from the buffer. 
+Therefore, the random order of the dataset influences which images are used for image generation and training.
+Although this order is shuffled each epoch, this can result in some images not being included for training or some images being used disproportionately. 
+This can lead to an unbalanced training dataset for I2I and potentially result in poor image generation quality.
+Additionally, it should be noted that in the GenSegNet model, the CycleGAN is trained for over 50 epochs, unlike the 30 epochs in the experiment described in Section \ref{experiment_enhance1}. 
+This increase in training duration can also have an influence on the generated images.\\
+As stated in section \ref{gen_seg_exp12} the segmentation of GenSegNet performs worse over all domains and in the no-smoke domain, but improves minimally for the heavy-smoke and slight-smoke domains compared to the baseline.
+The segmentation masks depicted in Figure \ref{fig:ex3_mask_showcase} indicate that especially false positives and erroneous classification of pixels lead to this behavior.
+The segmentation masks and the improvement observed in the smoke containing domains also suggest that the presence of surgical instruments is still better recognized.
+However, the pixels containing said instruments are often misclassified.\\
+A reason for this could be that due to increased training with heavy smoke, the network learns less about the characteristics of the surgical instruments, as they are often heavily occluded.
+Additionally, the deterioration of the segmentation results could be due to the presence of artifacts in the generated images.
+A structural reason for the poorer segmentation performance could be attributed to the training process.
+Here it is possible that an image is used for training the segmentation network and then temporarily stored in the buffer for image generation. 
+Subsequently, it is used for image translation and again utilized to train the segmentation network. 
+This results in training with the same image twice in succession, once original and once in the heavy-smoke domain, potentially impacting the segmentation quality.
+On the other hand, this approach could provide the segmentation network with the opportunity to learn the influence of smoke more adequately. 
+By presenting the network with both the smoke-free and smoke-covered versions of an image, it could gain a better understanding of how smoke occludes surgical instruments.\\
+Although a slight improvement in object detection in the presence of smoke is plausible, due to false predictions and degradation of the evaluation metrics over all domains combined, an overall improvement in segmentation cannot be asserted in this scenario.
+
+\section{Future work}
+Further efforts need to be invested into GenSegNet as the first image generation and integration approach with CycleGAN appears to be more effective. 
+Relying solely on cycle-consistency may not be sufficient to ensure image quality as it prevents alterations in the overall structure of the image but it does not guarantee the absence of artifacts. 
+An alternative approach could involve generating images using the GenSegNet with a suitable configuration and subsequently training the segmentation network as in the initial experiment. 
+It may be beneficial to explore other GANs like the ones mentioned in chapter \ref{litrev_gans}, to integrate them into the GenSegNet.
+Furthermore, it may be worth considering modifications to the training structure of GenSegNet to address the potential sources of error discussed in Section \ref{genseg_discussion}. 
+
+\section{Conclusion}
+In this work, two I2I models are used and evaluated for smoke generation.
+The most adequate artificial smoke images are used to augment the training data of DeepLabv3+.
+This offers promising results for an overall improvement in segmentation performance, particularly when encountering interferences such as heavy smoke.
+This method could be beneficial for improving applications that rely on segmentation in MIS.
+Furthermore, a method was proposed, that integrates segmentation into I2I translation and simultaneously improves segmentation using the generated images, aiming to achieve further enhancement.
+The method, while showing some promise in theory, fell short of fully meeting the expected results in practical implementation.
+The evaluation and testing revealed limitations and shortcomings that hindered its effectiveness in improving the segmentation task. 
+Further investigation is necessary to address the remaining challenges and achieve the desired outcome. 
+The promising results obtained in the initial attempt to improve segmentation emphasize the importance of exploring alternative methodologies to effectively overcome the challenges encountered in the study.

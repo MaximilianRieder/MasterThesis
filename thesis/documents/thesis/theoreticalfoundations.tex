@@ -1,0 +1,317 @@
+\chapter{Theoretical foundations}\label{theoreticalfound}
+\section{Fundamentals of machine learning}\label{fundmachinelearning}
+In the following section, the fundamentals of machine learning necessary for the understanding of this thesis are explained. 
+It should be noted that not every subarea is covered here, but only concepts that are used and which provide an important contribution to the understanding of the work are described here.
+\subsection{Structure of an artificial neural network}
+\begin{figure}[bt]
+    \begin{center}
+     \includegraphics[width=15cm]{./images/ann_figure_cropped.pdf}
+    \caption[ANN structure.]{{Basic structure of a feedforward ANN. 
+        The veritcally aligned circles represent the neurons in the individual layers, which are connected through the learnable weights of the network (arrows).
+        Activation functions process the weighted sum of each neuron, which represents the inputs for the neurons of the next layer.}\label{artificial_neural_network_figure}}
+    \end{center}
+\end{figure}
+The basic idea of an artificial neural network (ANN) is to immitate the way the nervous system processes information. 
+Just like the nervous system an \acs{ann} consists of neurons, which activate further neurons depending on the input.
+These activations may be adjusted and behave differently after certain inputs were given to them. This process is called learning~\cite[1-3]{aggarwal2018neural}.\\
+The following explanation is done on the basis of an fully connected feed forward network.\\
+The structure of this type of \acs{ann} consists of different layers, namely the input, hidden and output layer.
+The input layer distributes the input, which is usually a multidimensional vector, to the hidden layer.
+The hidden layer possibly consists of numerous layers and processes the information given from the input layer.
+It is responsible for performing the calculations of the chosen application.
+In the output layer the information of the last hidden layer is then combined to an output, which is in the desired form for the required task \cite[17-20]{aggarwal2018neural}.\\
+The structure of a layer is usually based on vectors, whereby each element of the vector resembles a neuron in the layer.
+Each of those receive input from the neurons in the preceding layer.
+These inputs are multiplied by the learnable weights of the connections between the neurons.
+Afterwards they are processed by the current neuron to generate an output, e.g. through summation of all the inputs multiplied with the corresponding weight for each input.
+The weighted sum may be passed through an activation function, which results in the activation of the neuron, before being used as input for the next layer of neurons \cite[17-20]{aggarwal2018neural}.
+A basic understanding of activation functions is given in section \ref{activation_function}.\\
+During the processing of the data the input values of the single layers are more and more abstract features extracted from the original data.
+The goal is to identify the relevant concepts that can effectively explain the connections in the observed data.
+To reach this goal, the \acs*{ann} is adjusted by changing the learnable weights of the connections \cite[164-167]{Goodfellow-et-al-2016}.
+The basic architecture of an feedforward ANN is shown schematically in Figure \ref{artificial_neural_network_figure}.
+
+\subsection{Activation function}\label{activation_function}
+An ANN entirely without activation functions can be represented with a single linear function.
+In practice, however, the solving of many more complex problems requires a non-linear solution.
+If an \acs{ann} is applied to such a task, it has to be turned from a linear function to a non-linear one.
+Therefore, a non-linear activation function is needed.
+These functions are inserted between the layers of an \acs{ann}, where they process the output before passing it as the input to the next layer.
+There are different types of activation functions including linear and non-linear ones, but at least one non-linear is needed to make the entire network non-linear.
+An example would be the commonly used Rectified Linear Unit (ReLU) function. It is defined as shown in equation \ref{sig_act}, taken from \cite{Sharma2020}:
+\begin{equation}\label{sig_act}
+    f(x) = \text{max}(0, x)
+\end{equation}
+This function is used to map the negative values for the next layer to zero and to the value itself otherwise~\cite{Sharma2020}.
+
+% paragraph
+\subsection{Learning paradigms}
+Two of the main types of learning strategies used in image processing are supervised and unsupervised learning.
+With supervised learning, the algorithm is trained using pre-labeled inputs that serve as targets.  
+The objective is to minimize the difference of the predicted output value and the target labels to learn.
+This difference is usually calculated with a loss function \cite{journals/corr/OSheaN15}.\\
+In unsupervised learning, the algorithm's performance is evaluated based on its ability to identify patterns in the data without the use of manually generated labels. 
+One way of doing this is by minimizing an objective function that quantifies the discrepancy between the model's predictions and the structure of the actual data \cite{journals/corr/OSheaN15}.\\
+However, since there are no predefined labels, the objective function has to be defined in a different way than in the supervised task.
+One example would be the adversarial loss of \acsp{gan} described in section \ref{adversariallearning}.
+Here, a second ANN makes a prediction of how close the outputs are to the real data.
+The objective for the ANN to be trained is therefore to produce an output, which is assumed of the second network to be the same as the actual data.
+The objective function is hereby based on the prediction of the second network.
+
+\subsection{Training of artificial neural networks}
+When it comes to training a ANN with an objective or loss function, there are usually two fundamental steps involved: forward-propagation and backward-propagation.
+In the following, only objective functions are considered, which includes loss functions.\\
+In the forward-propagation process, the network receives input data and processes them to generate an output.
+The output is then evaluated using the objective function. 
+This objective function can be different depending on the specific application being addressed \cite[14-16]{aggarwal2018neural}.
+The goal is to adjust the weights in a way so that the result of the objective function is minimized.\\
+This is done in the backpropagation step, which uses a technique called gradient descent \cite[21-24]{aggarwal2018neural}.
+The gradient is a vector of the partial derivatives of the objective function with respect to each weight in the ANN.
+Because the partial derivatives in the gradient point to the direction of the steepest increase of the objective function, the weights are adjusted in the opposite direction.
+This leads to a minimum of the objective function.
+An optimization algorithm, like the adaptive moment estimation (Adam) or stochastic gradient descent (SGD), can be used to update the weights of the network using the gradient.
+
+\paragraph{Adam} Adam includes momentum in the calculation of the weight adjustment.
+Momentum can be understood as integrating the values of previous gradient calculations in the current one.
+This can help prevent getting stuck in a local minimum instead of a global one \cite{Kingma2014}.
+This is because the weights are adjusted even more into the direction of the minimum, when the previous negative gradients already points in that direction.
+For the reverse case, when the optimization has already reached a global minimum and the optimization direction reverses, the adjustion in the direction of the minimum is reduced, since the momentum and the new gradient point in opposite directions.
+This can prevent a further exceeding of the minimum or getting stuck in a local one.\\
+The algorithm proposed in \cite{Kingma2014} can be seen in algorithm \ref{adam_opt_alg}.
+%- evtl. abbildung wie momentum konvergenz beeinflusst auch wenns über das minimum hinaus ist
+\begin{algorithm}
+    \caption{Description of the Adam optimizer algorithm.
+    It is to be noted, that an $\epsilon$ is introduced as a small constant, to prevent division through zero.
+    Also the square of a vector denotes an elementwise square.}\label{adam_opt_alg}
+\begin{algorithmic}[1]
+    \Require $\alpha$ \Comment{Stepsize}
+    \Require $\beta_1, \beta_2 \in [0,1]$ \Comment{Exponential decay rate for moment estimates}
+    \Require $f(\theta)$ \Comment{Objective function $f$}
+    \Require $\theta$ \Comment{Previously initialized model parameters $\theta$}
+    \State $m_0 \gets 0$
+    \State $v_0 \gets 0$
+    \State $t \gets 0$
+    \While{$\theta_t \text{not converged}$}
+        \State $t \gets t + 1$ 
+        \State $g_t \gets \nabla_\theta f_t(\theta_{t-1})$ \Comment{Get gradients}
+        \State $m_t \gets \beta_1 \cdot m_{t-1} + (1 - \beta_1) \cdot g_t$ \Comment{Biased first moment estimate}
+        \State $v_t \gets \beta_2 \cdot v_{t-1} + (1 - \beta_2) \cdot g_t^2$ \Comment{Biased second moment estimate}
+        \State $\hat{m_t} \gets m_t / (1 - \beta_1^t)$ \Comment{Correct fist momentum}
+        \State $\hat{v_t} \gets v_t / (1 - \beta_2^t)$ \Comment{Correct second momentum}
+        \State $\theta_t \gets \theta_{t-1} - \alpha \cdot \hat{m_t} / (\sqrt{\hat{v_t}} + \epsilon)$ \Comment{Update parameters}
+    \EndWhile
+    \Return $\theta_t$
+\end{algorithmic}
+\end{algorithm}
+Besides the objective function $f$ and the weights $\theta$ of the network also a stepsize $\alpha$ and the decay rates $\beta$ have to be provided to the algorithm.
+Thereby the the latter can be chosen depending on the problem. 
+The stepsize $\alpha$ is responsible for how much the weights should be adjusted in each step.
+Whereas, $\beta_1$ and $\beta_2$ control the influence of the momentum.
+In the first step the momentum $m$, $v$ and the current timestep $t$ are initialized with zero.
+The next part of the algorithm is where the calculations are done.
+After the incrementation of the timestep $t$ the gradient $g_t = \nabla_\theta f_t(\theta_{t-1})$ is calculated at the current timestep. 
+It is to be noted that in the calculation of gradients stochasticity is introduced, for example choosing a random subsample for computation. 
+Further, the momenta $v_t$ and $m_t$ at the current timestep are determined.
+For this the previous momenta and the gradients are scaled with the decay rates $\beta_1$ and $\beta_2$, respectively, and are summed up.
+The gradients in this sum are scaled with the opposite of the decay rates and for the second momentum $v$ the gradients are squared.
+Afterwards the bias of the momenta introduced by decay rate is corrected, which results in the corrected momenta $\hat{m_t}$ and $\hat{v_t}$.
+With these, the weights of the model are adjusted in the last step of the loop.
+This process will be repeated until the parameters $\theta$ are converged or a fixed number of times.
+Then the weights of the network are returned.
+In this way the adam optimizer adjusts the weights of the model to minimize the objective function.
+
+Further considerations for a working training in machine learning are the following.
+To reach an optimum of performance, the model complexity, for instance the number of hidden layers, has to be high enough to be able to capture the underlying patterns.
+Also the training iterations have to be numerous enough.
+If those requirements are not met the neural network will underfit and can not predict the output as desired due to a lack of information of the weights, resulting in poor predictive performance.
+It should be noted, that it is also not best to train a neural network as long as possible and make it as complex as possible.
+This is because a long enough trained and complex enough \acs{ann} will memorize every detail about the training data and not just the underlying patterns.
+When the neural network is applied to data, that is not the training data, the prediction will be very poor, because the network did not learn the fundamental structure of the data.
+This lack of generalizability is called overfitting. The challange is to find the balance between over- and underfitting \cite{smith2018disciplined}.
+
+\section{Convolutional neural networks}\label{convnetworksection}
+The following describes the convolutional neural networks (CNNs) and the mathematical operations required for them.
+\subsection{Convolution and pooling operations}
+\begin{figure}[b]
+    \begin{center}
+    \includegraphics[width=10cm]{./images/Conv_basic_cropped.pdf}
+    \caption[Convolution.]{{Exemplary calculation of a 2D convolution operation. 
+    The green line indicates the position $s$ where input $x$ and kernel $w$ overlap.
+    At this position the the scalar output is calculated. This is done for every position the kernel fits.
+    It is to be noted, that for the sake of simplicity a stride of one and no padding is chosen.}\label{conv_basic}}
+    \end{center} 
+\end{figure}
+\paragraph{Convolution}
+Some ANNs, like the \acs{cnn}, make use of the convolution operation. 
+A convolution is a function that calculates a feature map from two matrices, namely the input and the kernel, whereby the input is commonly an image represented by a matrix. 
+The kernel on the other hand is often a smaller matrix, which is slid over the input.
+The weights of the kernel and the input are then calculated to a scalar where they are overlapping.
+The values in these matrices are in the form of real numbers \cite[327-329]{Goodfellow-et-al-2016}.
+This operation is defined for an input image $I$ and a two-dimensional kernel $K$ as in equation \ref{conv_equatin}, taken from \cite[328]{Goodfellow-et-al-2016}:\\
+\begin{equation}\label{conv_equatin}
+    s(t) = (K \ast I)(i,j) = \sum_{m}\sum_{n}I(i-m,j-n)K(m,n)
+\end{equation}
+$(i,j)$ represents the position at which the convolution operation is being evaluated. 
+This process is visualized in Figure \ref{conv_basic}.
+There is also a change in dimension from the input size $4\times3$ to the output dimension $3\times2$ to be seen.
+This shows, that convolutions can be used to reduce the dimension of the input.
+Figure \ref{conv_basic} shows a 2D convolution, which means the depth of the input and the kernel is one.
+In the case of a three dimensional convolution the kernel also slides in depthwise direction.\\
+Besides the kernel size, the output of the convolution also depends on the specified stride and padding.
+In the previously explained example it was assumed that no padding is used and the stride is one.
+The stride increases the distance where the kernel will be positioned, to calculate the output.
+For example a stride of two will skip each second position where the kernel could be placed on the input.
+Therefore the output dimension is decreased \cite{Albawi2017}.\\
+Padding describes the process of placing additional values around the input.
+This serves the purpose of preventing the loss of information on the borders of the input, as the border values are less often included in a convolution. 
+The reason for this is, that the kernel cannot be positioned on these entries in the way it is positioned on other values, since the kernel cannot exceed the borders of the input.
+One simple method is called zero padding, where the input is extended with zeros around it\cite{Albawi2017}.\\
+% formeln beschreiben
+Convolutions usually aim to extract features, representing relevant information, from local regions of the input.
+The local regions are determined by the dimension of the kernel. %  here
+\paragraph{Atrous convolution}
+\begin{figure}[tb]
+    \begin{center}
+    \includegraphics[width=10cm]{./images/atrous_conv.drawio.pdf}
+    \caption[Atrous convolution]{{The left convolution kernel is chosen with a dilation rate of one, representing a standard convolution operation.
+    The right kernel shows a kernel with dilation rate two, which means there is one gap between each weight of the kernel. 
+    These gap pixels are grayed out.}\label{atrous_conv_fig}}
+    \end{center}
+\end{figure}
+A method to enhance the operations receptive field, is the usage of atrous convolution.
+There the kernel is expanded through the insertion of gaps between its weights.
+These gaps make the convolution capture more information from a larger area, without increasing the number of parameters in the network.
+The gap size is controlled by the dilation rate parameter, which indicates how many datapoints should be left out between each weight.
+A dilation rate of one is equal to a standard convolution.
+An example of how the dilation rate affects the receptive field of the atrous convolution can be seen in Figure\ref{atrous_conv_fig}.
+With this operation it is possible to capture features at different scales.
+This is for example useful, when dealing with data in higher resolution\cite{Chen2017}.
+\paragraph{Pooling}
+Pooling on the other hand mainly serves to reduce the dimension of the input. 
+It resembles the convolution in the sense, that a kernel is slid over an input matrix. 
+But instead of calculating a scalar it summarizes the information of the overlapping region.
+There are no learnable kernel weights, instead it is a fixed mathematical operation.
+An example for this would be the max-pooling, where the maximimum value of the specified area is returned \cite{Ajit2020}.
+The remaining assumptions of the convolution operation, such as step size an so on, are also valid for the pooling operation. 
+\paragraph{Transposed convolution}
+In contrast to the beforementioned convolution operations, the input dimensions can be expanded by the application of transposed convolutions.
+Transposed convolutions can be seen as the reverse operation of a convolution, therefore, it takes a feature map as input and produces an image.
+The feature map is firstly upsampled by inserting zeros between the feature values. 
+Then a padding is applied and at last the kernel calculates the output from this intermediate result.
+The transposed convolution for a convolution $C$ with stride $s$, kernel size $k$, and padding $p$ is calculated as follows.
+$s - 1$ zeros are inserted between the feature values.
+Then a padding of $k - p - 1$ is introduced and on this in turn the kernel of the transposed convolution is applied.
+This results in the transposed convolution of $C$~\cite{Dumoulin2016}.
+
+\subsection{Structure of CNNs}
+In the field of image processing a widely used neural network is the \acs{cnn}, with which promising results in the area of visual recognition could be achieved in the last years \cite{gu2018recent}.
+Like \acsp{ann}, \acsp{cnn} are similar in the sense that they also consist of the same structur of layers as the \acsp{ann}.
+These layers consist of neurons arranged in three dimensions: height, width, and depth.
+This three dimensional structure is also referenced as feature map.
+The neurons in a given layer only receive input from a local region of the layer immediately preceding it, which is determined by the connection between the layers. 
+These connections are convolution or pooling operations and the weights of the \acs{cnn} therefore would be the kernel values of the convolutions \cite{journals/corr/OSheaN15}.\\
+Convolutions are applied to the feature maps in the hidden layer of a \acs*{cnn} and produce the next feature map.
+Before the feature maps are passed to the next layer, an activation function can be introduced here to introduce non-linearity.\\
+Because the kernel only consideres a reduced part of the input to calculate the output, while sliding over the whole image, the number of connections is significantly smaller than a fully connected layer.
+This makes it comparatively efficient, while still covering the whole input matrix and possibly finding patterns in the whole image \cite{Albawi2017}.\\
+The convolution operations are also called filters.
+When more than one of these filters are used in a layer of the \acs*{cnn}, they are applied to the input features individually and produce a feature map for each filter.
+These filters have their own learnable kernel weights and are designed to learn a different feature or pattern from the input data.
+The combined feature maps serve as input for the next layer. 
+The last layer often is a fully connected layer, where all elements of the flattened feature maps are connected to an output suited for the application \cite{Ajit2020}.
+E.g. in a classification task the fully connected layer could map the outputs of the last hidden layer to a vector of class scores, which indicate the probability that the input contains a certain class.
+
+\section{DeepLabv3+}
+In its core semantic segmentation is a computer vision task that involves assigning a class label to every pixel in an image.
+To solve this task usually a encoder-decoder strucute is used to first reduce the feature maps, which are extracted from the image through convolutions.
+This results in a compressed representation of the image, that holds the information about the semantically related parts in it.
+This representation is scaled up in the further layers of the decoder part of the network, until it reaches the size of the original image again \cite{Badrinarayanan2017}.\\
+In the end the output can be computed through a softmax layer, that produces the probabilities for each pixel to belong to a certain class \cite{Badrinarayanan2017}.
+Then this output can be compared to its target label and with the help of a suitable loss function the weights of the segmentation network can be adjusted to make a more accurate prediction.
+It should be noted, that residual connections are often part of these networks to allow a more deep architecture \cite{Li2019}.
+Also atrous convolutions are used for recognizing correlations on different scales \cite{Chen2017}.
+The DeepLabv3+ is a convolutional semantic segmentation network that can perform such a task.
+The encoder in this network is a ResNet, which is explained in section~\ref{resnet}.
+
+\subsection{ResNet}\label{resnet}
+\begin{figure}[bt]
+    \begin{center}
+     \includegraphics[width=7cm]{./images/Res_connection.drawio.pdf}
+    \caption[Residual block]{{Example of a residual block, where the layers $F(x)$ consist of two convolutional operations and the identity $x$ skips the computation in $F(X)$.}\label{res_block_figure}}
+    \end{center}
+\end{figure}
+Deeper neural networks are needed for complex tasks, because they have more learnable parameters and thus more potential to adapt to the needed task.
+% for example imgae net challange in https://arxiv.org/pdf/1512.03385.pdf
+It is known for a deeper neural network to be harder to train to an optimum.
+Residual connections can help with this issue~\cite{He2015}.
+They are defined as:
+\begin{equation}
+    F(x) + x
+    \label{res_con}
+\end{equation}
+Function $F(x)$ denotes a sequence of layers in a neural network, whereas $x$ represents the identity of the input.
+After the last layer the output of $F(x)$ is summed up with $x$.
+That is why this type of connection is often refered to as skip connection, because $x$ will skip the layers contained in $F(x)$.\\
+Residual connections can help to alleviate the problem of degradation, where the accuracy of the network starts to decrease with increasing depth, as stated in \cite{He2015}.
+A representation of this kind of connection can be seen in Figure~\ref{res_block_figure}, showing a residual block.
+When more of these residual blocks are used together to build a \acs{cnn} it is called a ResNet, which are used frequently in computer vision tasks.
+%It is easier for this kind of network to learn the correct mapping from input to output, if the identity mapping $x$ of a residual connection is added to some layers.\cite{He2015}
+
+\subsection{DeepLabv3+ architecture}\label{dlv3_section}
+A state of the art semantic segmentation network is the DeepLabv3+.
+It uses a encoder decoder structure to improve its segmentation results in comparison to its predecessors.\\
+The encoder is structured as follows.
+At first it uses a ResNet-101 as backbone to extract features from the image.
+This CNN consists of several convolution and pooling opertions paired with residual connections \cite{Chen2018a}.
+The feature map is then fed into an atrous spatial pyramid pooling (ASPP) module, which consists of atrous convolution layers with different dilation rates that are arranged in a parallel way.
+The ASPP serves the purpose of extracting information from the feature map at different resolutions and the capturing of multi-scale features \cite{Chen2018}.
+In addition to the atrous convolutions global average pooling is used for integrating global context information \cite{Chen2017}.
+The outputs of the ASPP including the pooling results are concatenated to a feature map with 256 channels, which is are reduced to one channel through a 1$\times$1 convolution and then used as input for the decoder.\\
+Here in the decoder part of the network the input is firstly bilinear upsampled by a factor of four, which corresponds to increasing the size of this feature map by four.
+%Hereby the new values are determined by averaging 16 nearest pixels in the orig inal image, with weights based on relative distances. 
+%zitat für bilinear upsampling 
+This is done to make it correspond to the low-level feature map, that was produced by the backbone in the first step, because afterwards this feature map is concatenated with it.\\
+The depth of the low-level features is also reduced to one to not make them overshadow the importance of the high-level feature map.
+The output of their concatenation is refined through a 3$\times$3 and 1$\times$1 convolution.
+The final features are then upsampled to match the pixel positions and it remains a prediction for the class membership of each pixel position~\cite{Chen2018a}.
+The strucute of the DeepLabv3+ as introduced by~\cite{Chen2018a} can be seen in Figure~\ref{deeplab_v3_plus}.
+\begin{figure}[bt]
+    \begin{center}
+     \includegraphics[width=15cm]{./images/deeplab_v3_plus.drawio.pdf}
+    \caption[DeepLabv3+ architecture.]{{Visualization of the DeepLabv3+ architecture.}\label{deeplab_v3_plus}}
+    \end{center}
+\end{figure}
+\subsection{Lovász-Softmax loss}
+A well working loss function for training multi-class segmentation tasks is the Lovász-Softmax loss.
+Therefore it is a suitable choice for training the DeepLabv3+.
+It is based on the jaccard index, also known as the intersection over union, which measures the similarity between two sets of data.
+In the case of segmentation it can be used to compare the ground truth labels to the predicted labels of the segmentation network.
+For a specific class $c$ it is defined as in equation~\ref{jaccard_index}, according to~\cite{Berman2017}:
+\begin{equation}
+    J_c(y^* , \tilde{y}) = 1 - \frac{|{y^* = c} \cap {\tilde{y} = c}|}{|{y^* = c} \cup {\tilde{y} = c}|}
+    \label{jaccard_index}
+\end{equation}
+The arguments of the jaccard index are the vector of the ground truth $y^*$ and the vector of predictions $\tilde{y}$.
+Hereby the intersection of the ground truth and the predictions of a class $c$ is devided through the union of both.
+It indicates the ratio of overlaps of the prediction and the correct labels to the total area of pixels, where the class is either predicted or contained in the ground truth.
+If one would use the jaccard index as a loss function it can be defined as shown in equation~\ref{jaccard_index_loss}, according to~\cite{Berman2017}:
+\begin{equation}
+    \Delta_{J_c}(y^*, \tilde{y}) = 1 - J_c(y^*,\tilde{y}) = \frac{|M_c|}{|\{y^* = c\} \cup M_c|}
+    \label{jaccard_index_loss}
+\end{equation}
+Here the $M_c$ is representative for the misspredictions of the class $c$, which includes the false positives and false negatives.
+However this jaccard loss is not differentiable, which means that it cannot be used for gradient calculation. 
+To solve this problem the Lovász-Softmax loss is used as a working surrogate of the jaccard loss function.
+For one class it is defined as shown in equation \ref{lov_soft_loss}, according~\cite{Berman2017}:
+\begin{equation}
+    \text{loss}(f) = \frac{1}{|\mathcal{C}|} \sum_{c\in \mathcal{C}} \overline{\Delta_{J_c}}(\mathbf{m}(c))
+    \label{lov_soft_loss}
+\end{equation}
+Hereby $\overline{\Delta_{J_c}}$ denotes the extended jaccard loss.
+The the jaccard loss is extended through the Lovász extension, whereby the steps to calculate this result are differentiable and therefore usable for backpropagation~\cite{Berman2017}.\\
+The way this extension is done is described in \cite{Lovasz1983}.\\ % seite 51 und 46
+To create the loss surrogate the pixel errors $\mathbf{m}(c)$ for a class $c$ are needed.
+To get this pixel errors the predictions of the network are processed by a softmax function, that produces a vector representing the probability of the corresponding input belonging to a certain class. 
+If for a specific pixel the class is not contained in the ground truth, the error is the prediction of the softmax function and one minus the prediction otherwise.
+The results of the extension calculation are averaged through summation and division through the number of classes \cite{Berman2017}.
+This way a neural network can be trained using a surrogate function of the jaccard index.

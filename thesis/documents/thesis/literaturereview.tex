@@ -1,0 +1,95 @@
+\chapter{Related work}\label{literaturereview}
+
+\section{Generation of artificial images}\label{litrev_gans}
+Image generation based on Generative Adversarial Networks (GANs) is a powerful technique in machine learning that enables the creation of high-quality and realistic images \cite{wang2018high}.\\
+GANs were first introduced by Goodfellow et al. in 2014 \cite{Goodfellow2014}. 
+They introduced a new deep-learning architecture composed of two neural networks: a generator and a discriminator.
+The generator network tries to generate realistic data samples, while the discriminator network tries to distinguish between real and generated data samples.
+They are trained iteratively in an adversarial way. This is the foundation of many extensions and an important step in developing generative models.
+Deep Convolutional Generative Adversarial Networks (DCGANs) are a variation of GANs that use convolutional neural networks (CNNs) in both the generator and discriminator networks.
+They were first introduced by Radford et al. \cite{Radford2015}.
+The key innovation of DCGANs is the use of convolutional layers, which allow the networks to learn local patterns in the data.\\
+An even more realistic generation of images can be achieved through further GAN extensions, like the Self-Attention GAN (SAGAN) \cite{Zhang2018} and the use of Style-based generators for adversarial networks \cite{Karras2018}.
+SAGAN focuses on generating realistic images with a diverse output, using an attention mechanism that allows the model to focus on different parts of the input image. 
+The extension with a style-based generator, on the other hand, is designed to generate high-quality and diverse images by separating the style and content of the generated images, which gives the network the ability to control the features of the generated images at a fine level.
+These networks focus on generating realistic images from a random vector like the GAN.\\
+GANs have proven to be a powerful tool for generating realistic images, but they can also be used for I2I translation.
+Pix2Pix represents a significant advance in the field of generative models for I2I translation tasks \cite{isola2017image}.
+It is based on a conditional GAN that is trained on paired data, to learn a pixel-accurate translation of the provided domains.
+The generator of the conditional GAN is hereby conditioned with the information of the input image and a random vector to achieve a more diverse output.
+CycleGAN is a deep learning architecture that received great attention in the field of I2I translation due to its ability to learn a mapping between different domains without requiring paired training data \cite{Zhu2017}.
+Furthermore, it generates images that have a similar structure to the original images.
+Therefore it uses a cycle consistency loss, which ensures that the generated images can be mapped back to the original domain.
+This enforces the translation process to not change the domain-independent features.\\
+Another model for I2I translation is Unsupervised I2I Translation (UNIT), which is a popular unsupervised method that was proposed by Liu et al. in 2017 \cite{Liu2017}. 
+UNIT uses a shared-latent space to learn the mapping between two domains.
+The mapping works hereby by mapping images from both domains to a shared latent space and using domain classifiers to ensure the generated images belong to the correct domain.
+The classifier is a neural network that aims to classify an image as belonging to a specific domain.
+The shared latent space can be understood as a representation of the essential features both images have in common.\\
+Diverse I2I Translation (DRIT) also uses the idea of a shared latent space and also a cross-cycle consistency loss, to ensure that the input image can be reconstructed \cite{lee2018diverse}.
+Other models for unpaired I2I translation like the Adversarial Consistency Loss GAN (ACL-GAN) \cite{Zhao2020} try to relax the cycle consistency loss in favor of generating more realistic images.
+Because the cycle consistency loss operates on a pixel level it is rather strict.
+In the ACL-GAN a new adversarial consistency loss is proposed, which is enforced through a consistency discriminator that predicts if an input and a reconstructed image are consistent with each other.
+This loss encourages translated images to retain important features of the source images and is used instead of the cycle consistency loss.\\
+To translate images between multiple domains without paired data Choi et. al \cite*{choi2018stargan} proposed the StarGAN.
+Its main advantage is that it only consists of one generator and one discriminator, whereas conventional multi-domain models require a generator discriminator pair for each domain.
+This is done by conditioning the generator on the desired target domain label and a discriminator that can also predict the domain contained in an image.\\
+In StarGANv2 an extension is made to make the images scalable between different domains and improve the results for multiple target domains.
+This is done by using a style encoder in the network, whose results are incorporated in the generation process \cite*{choi2020stargan}.\\
+%auch paper die sagen dass kacke: https://arxiv.org/pdf/2103.01456.pdf 
+One of the newest I2I models that implements cycle consistency is the Unet vision transformer cycle-consistent GAN (UVCGAN) proposed by Torbunov et al. in 2023 \cite{torbunov2023uvcgan}.
+It is also usable with unpaired data and is based on a hybrid generator architecture, which is based on an Unet and a vision transformer network.
+Furthermore, it relies on self-supervised pre-training to prevent overfitting due to its increased complexity.
+Compared to models, which relax the cycle consistency constraint, it aims for a strong correlation of input and output image \cite{torbunov2023uvcgan}.\\
+I2I translation can also be performed with Conditional Variational Autoencoders (CVAEs).
+They were introduced by Kingma et al. \cite{kingma2014semi}, where they use unlabeled data to improve the performance of deep learning models trained on labeled data.
+The VAEs are trained to learn a low-level representation of the data, which is in turn used for classification tasks.
+A neural network of this type, which can be used for I2I translation, is the Domain Transfer Network (DTN) presented by Taigman et al. \cite{taigman2016unsupervised}.
+Although it is stated that the adversarial loss from GANs can be used in the training, an alternative loss is proposed, where the output of the generative model is directly compared with samples from the original distribution through the KL-divergence.
+
+\section{Data augmentation}
+Data augmentation is a widely used technique to improve segmentation.
+In medical context often a lack of annotated training data is responsible for insufficient segmentation results \cite{maier2022surgical}.
+Therefore Platscher et. al \cite{platscher2022image} train different I2I translation models to synthesize MRI images of brain volumes with and without stroke lesions from semantic segmentation maps.
+They also train a GAN to generate synthetic lesion masks. These two components are used to create an extended dataset of synthetic stroke images for training.\\
+%nochmal anschaun + https://scholar.google.com/scholar?as_ylo=2022&q=data+augmentation+for+medical+image+segmentation&hl=de&as_sdt=0,5
+A similar approach was made by Golhar et al. \cite{golhar2022gan}, where they use gan inversion to perform a style transfer between white-light and narrowband images and change the size of lesions in colonoscopy images.
+For GAN inversion they use an encoder, which maps images into a latent code.
+This latent code is then fed into a StyleGAN-ADA to generate an image similar to the one used to generate said code, but with the properties that the StyleGAN-ADA was trained on.
+The generated images are then used to improve the classification of polyps.\\
+Sandfort et al. \cite{sandfort2019data} made use of a CycleGAN for data augmentation in CT segmentation.
+They train a CycleGAN to transform contrast CT images into non-contrast images and augment their training data with this model.
+The results of the segmentation show a great improvement in certain classes, but less in others.\\
+%wenn noch was fehlt hier raus nehmen
+%https://openaccess.thecvf.com/content/CVPR2021W/ISIC/papers/Bissoto_GAN-Based_Data_Augmentation_and_Anonymization_for_Skin-Lesion_Analysis_A_Critical_CVPRW_2021_paper.pdf
+
+\section{Smoke in computer vision tasks}
+\paragraph*{Desmoking} Desmoking images in MIS is a different approach that could lead to better segmentation results.
+To desmoke images from laparoscopic surgery, Salazar et al. \cite{salazar2020desmoking} use a conditional GAN that translates images with smoke present to images without smoke.
+To guide the translation, an estimation of the dark-channel of the images is used to detect the regions where smoke is present.
+The dark-channel is defined as the minimum pixel value over a region in an image, whereby regions without smoke are supposedly more likely to have a lower value \cite{salazar2020desmoking}.\\
+Pan et al. \cite{pan2022desmoke} propose a similar method for desmoking laparoscopic images in 2022, called DeSmoke-LAP.
+They use a CycleGAN for translating the images into a no-smoke domain, whereby they implement a dark-channel loss that penalizes the model for remaining smoke in the desmoked images.\\
+Hu et al. \cite{hu2021cycle} also use a CycleGAN for desmoking endoscopic images. 
+To locate the smoke that should be removed, a detection network is used to produce a mask that encodes the prediction for smoke occurrence in the image.
+The generator uses this mask to focus on these regions.\\
+
+\paragraph*{Generating artificial smoke} is another task that can be useful in various applications.
+Park et. al \cite{park2020wildfire} improve a DenseNet for wildfire detection by generating artificial images of forest fires including smoke clouds and use these images to train the detection network.
+For the generation process, they use a CycleGAN.
+A different approach is made by Mao et al. \cite{mao2021wildfire} to improve wildfire classification tasks by generating new training data. 
+They simulate smoke in a virtual wildland background using 3D modeling software.
+Afterwards, these synthetic smoke images are translated into photorealism using CycleGAN.\\
+Xie et al. \cite{xie2020generating} propose the CSGNet to generate realistic smoke images.
+Hereby, they introduce a smoke components control module, that generates smoke components, which can be understood as images of only smoke.
+These are then combined with a no-smoke image to an artificial smoke image by a proposed smoke image synthesis module.\\
+
+%Controllable smoke image generation network based on smoke imaging principle
+% \paragraph*{DeSmoke LAP} Desmoking images
+% GAN based dehazing
+% GAN-Based Data Augmentation and Anonymization forSkin-Lesion Analysis: A Critical Review
+% GAN-based data augmentation and anonymization for skin-lesion analysis: A critical review
+% Breaking the Dilemma of Medical Image-to-image Translation
+% SegAN: Adversarial Network with Multi-scale L 1 Loss for Medical Image Segmentation
+% Generating realistic smoke images with controllable smoke components???
+% A Review on GAN based Image Dehazing

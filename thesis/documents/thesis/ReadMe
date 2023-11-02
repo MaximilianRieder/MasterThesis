@@ -1,0 +1,12 @@
+Compiling the thesis template:
+
+latex thesis.tex
+biber thesis.bcf
+latex thesis.tex
+
+pdflatex thesis.tex
+
+use:
+pdflatex thesis.tex
+biber thesis
+pdflatex thesis.tex

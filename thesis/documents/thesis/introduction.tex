@@ -1,0 +1,33 @@
+
+\pagenumbering{arabic} % ab jetzt arabische Nummerierung
+
+\chapter{Introduction}
+%\section{Importance and challenges of segmentation in minmal invasive surgery}
+%\section{Improving the segmentation through generation of artificial smoke}
+Minimally invasive surgery (MIS) is a widely used surgery technique, because it offers several advantages over traditional open surgery \cite{mohiuddin2013maximizing}. 
+In MIS, surgeons make small incisions and use specialized tools to access and operate only on the affected area.
+This stands in contrast to open surgery, where gaining access is achieved through large incisions and opening up the body cavity.
+This way MIS induces less trauma, reduces blood loss, and ensures a faster recovery \cite{mohiuddin2013maximizing}.\\
+However, these benefits also come with challenges.
+One of which would be that the surgeon`s view of the operating field is often limited and can only be seen through an endoscope.
+This endoscope must always point at the surgical procedure, whereby the adjustment of this endoscope has to be often done manually.
+Therefore there are approaches to making the endoscope guidance robot-assisted, for which a segmentation of the received camera output is essential \cite{gruijthuijsen2022robotic}.\\
+This in turn brings its own challenges, as the quality of the images can be degraded by interfering influences.
+These interfering influences include reflections, motion artifacts, and smoke produced by cutting with an electrical cutter.
+This makes it difficult to control the endoscope in a robot-assisted way and harder for the surgeons to accurately interpret the images, which results in the need for an accurate segmentation that is less likely to be disturbed through interferences.
+Since one of the main interference factors is smoke, an approach would be to improve the segmentation in the presence of it.\\
+This thesis proposes a solution to improve the performance of segmentation models in MIS by generating synthetic images with specific characteristics.
+Specifically, the generation of artificially smoked images is explored as a means to increase the amount of training data for segmentation models, improving their ability to cope with challenging visual conditions such as smoke interference.
+An I2I translation model is trained to transform original images into output images with the desired smoked appearance, which are then used to augment the training data for a state-of-the-art segmentation network, DeepLabv3+ \cite{Chen2018a}. 
+Two I2I translation models, CycleGan \cite{Zhu2017} and StarGan \cite{choi2018stargan}, are hereby used and evaluated for generating artificial smoke images. 
+A new network, GenSegNet, is proposed to include segmentation in the image generation process. 
+GenSegNet is trained to reward the generative network for producing images that are difficult to segment, which in turn are used to further train the segmentation network.
+We hypothesize that using the proposed GenSegNet model will show further improvement in segmentation performance.
+The results of the experiments are evaluated using six-fold cross-validation.\\
+In this thesis firstly a theoretical foundation for machine learning is given for understanding in chapter \ref{theoreticalfound}.
+Afterwards, the used artificial neural networks (ANNs) are explained in chapter \ref{method}.
+Then the different experiments and their results are presented in chapter \ref{result}.
+At last, an interpretation of the results is given in chapter \ref{discussion}, showing how I2I translation to a domain with heavy smoke can help improve segmentation in MIS. 
+Here the limitations of the models and metrics are also addressed.
+%-> contribution
+
